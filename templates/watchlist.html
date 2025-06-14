@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Watchlist{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Watchlist Saham Anda</h3>
+        <a href="{{ url_for('tambah_saham') }}" class="btn btn-primary">
+            + Tambah Saham
+        </a>
+    </div>
+
+    <div class="mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Ketik untuk mencari kode saham...">
+    </div>
+
+    {% if stocks %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle text-center" id="stockTable">
+            <thead class="table-light">
+                <tr>
+                    <th>Kode Saham</th>
+                    <th>Harga Terbaru</th>
+                    <th>Status</th>
+                    <th>Harga Akumulasi</th>
+                    <th>Cut Loss</th>
+                    <th>TP 1</th>
+                    <th>TP 2</th>
+                    <th>TP 3</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in stocks %}
+                <tr>
+                    <td class="ticker-cell"><strong><a href="{{ url_for('detail_saham', ticker=stock.ticker) }}">{{ stock.ticker }}</a></strong></td>
+                    <td class="fw-bold">{% if stock.harga_terbaru %}{{ "{:,.0f}".format(stock.harga_terbaru) }}{% else %}-{% endif %}</td>
+                    <td><span class="badge fs-6 text-bg-{{ stock.status_color }}">{{ stock.status }}</span></td>
+                    <td>{{ "{:,.0f}".format(stock.harga_akumulasi_bawah) }} - {{ "{:,.0f}".format(stock.harga_akumulasi_atas) }}</td>
+                    <td>
+                        {{ "{:,.0f}".format(stock.harga_cut_loss) }}
+                        {% if stock.tanggal_cut_loss %}
+                            <br><small class="text-muted fst-italic">{{ stock.tanggal_cut_loss.strftime('%d-%m-%Y') }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ "{:,.0f}".format(stock.harga_take_profit_1) }}
+                        {% if stock.tanggal_tp_1 %}
+                            <br><small class="text-muted fst-italic">{{ stock.tanggal_tp_1.strftime('%d-%m-%Y') }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if stock.harga_take_profit_2 %}
+                            {{ "{:,.0f}".format(stock.harga_take_profit_2) }}
+                            {% if stock.tanggal_tp_2 %}
+                                <br><small class="text-muted fst-italic">{{ stock.tanggal_tp_2.strftime('%d-%m-%Y') }}</small>
+                            {% endif %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if stock.harga_take_profit_3 %}
+                            {{ "{:,.0f}".format(stock.harga_take_profit_3) }}
+                            {% if stock.tanggal_tp_3 %}
+                                <br><small class="text-muted fst-italic">{{ stock.tanggal_tp_3.strftime('%d-%m-%Y') }}</small>
+                            {% endif %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{{ url_for('edit_saham', stock_id=stock.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                            <form method="POST" action="{{ url_for('hapus_saham', stock_id=stock.id) }}" onsubmit="return confirm('Anda yakin ingin menghapus saham ini?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center p-5 border rounded">
+        <h4>Watchlist Anda masih kosong.</h4>
+        <p>Silakan tambahkan saham pertama Anda untuk mulai memantau.</p>
+    </div>
+    {% endif %}
+
+{% endblock %}
+
+
+{% block scripts %}
+    <script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toUpperCase();
+        let table = document.getElementById('stockTable');
+        let tr = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < tr.length; i++) { // Mulai dari 1 untuk skip baris header
+            let td = tr[i].getElementsByClassName('ticker-cell')[0];
+            if (td) {
+                let textValue = td.textContent || td.innerText;
+                if (textValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    });
+    </script>
+{% endblock %}

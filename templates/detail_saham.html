@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Detail {{ ticker }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+        <h2 class="mb-0">{{ stock_info.name }} ({{ ticker }})</h2>
+        <p class="text-muted">{{ stock_info.sector }}</p>
+    </div>
+</div>
+
+<div class="btn-group mb-4" role="group">
+    {% set periods = {'1mo': '1B', '3mo': '3B', '6mo': '6B', 'ytd': 'YTD', '1y': '1T', '5y': '5T', 'max': 'Semua'} %}
+    {% for period_code, period_name in periods.items() %}
+        <a href="{{ url_for('detail_saham', ticker=ticker, period=period_code) }}" 
+           class="btn btn-outline-primary {% if active_period == period_code %}active{% endif %}">
+           {{ period_name }}
+        </a>
+    {% endfor %}
+</div>
+
+<div style="height: 400px;">
+  <canvas id="priceChart"></canvas>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('priceChart');
+
+    // Mengambil data dari Flask/Jinja2 dan mengubahnya menjadi format JSON yang aman
+    const chartLabels = {{ labels|tojson }};
+    const chartData = {{ data|tojson }};
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Harga Penutupan (Rp)',
+                data: chartData,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+                borderWidth: 2,
+                pointRadius: 0, // Tidak menampilkan titik untuk setiap data agar lebih bersih
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    ticks: {
+                        // Format Angka di Sumbu Y
+                        callback: function(value, index, values) {
+                            return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                         // Format Angka saat kursor di atas grafik
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += 'Rp ' + new Intl.NumberFormat('id-ID').format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

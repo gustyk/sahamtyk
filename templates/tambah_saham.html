@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Tambah Saham{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3>Form Tambah Saham</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="ticker" class="form-label">Kode Saham (Ticker)</label>
+                        <input type="text" class="form-control" id="ticker" name="ticker" placeholder="Contoh: BBCA" required style="text-transform:uppercase">
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="harga_akumulasi_bawah" class="form-label">Harga Akumulasi (Bawah)</label>
+                            <input type="number" step="any" class="form-control" id="harga_akumulasi_bawah" name="harga_akumulasi_bawah" required>
+                        </div>
+                        <div class="col">
+                            <label for="harga_akumulasi_atas" class="form-label">Harga Akumulasi (Atas)</label>
+                            <input type="number" step="any" class="form-control" id="harga_akumulasi_atas" name="harga_akumulasi_atas" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="harga_cut_loss" class="form-label">Harga Cut Loss</label>
+                        <input type="number" step="any" class="form-control" id="harga_cut_loss" name="harga_cut_loss" required>
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="harga_take_profit_1" class="form-label">Harga Take Profit 1</label>
+                            <input type="number" step="any" class="form-control" id="harga_take_profit_1" name="harga_take_profit_1" required>
+                        </div>
+                        <div class="col">
+                            <label for="harga_take_profit_2" class="form-label">Harga Take Profit 2 (Opsional)</label>
+                            <input type="number" step="any" class="form-control" id="harga_take_profit_2" name="harga_take_profit_2">
+                        </div>
+                         <div class="col">
+                            <label for="harga_take_profit_3" class="form-label">Harga Take Profit 3 (Opsional)</label>
+                            <input type="number" step="any" class="form-control" id="harga_take_profit_3" name="harga_take_profit_3">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('watchlist') }}" class="btn btn-secondary">Batal</a>
+                        <button type="submit" class="btn btn-primary">Simpan Saham</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
