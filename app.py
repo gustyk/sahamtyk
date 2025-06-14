@@ -13,7 +13,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24) 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'site.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL').replace("://", "ql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -428,9 +428,3 @@ def hapus_saham(stock_id):
     db.session.commit()
     flash(f'Saham {stock.ticker} telah dihapus.', 'info')
     return redirect(url_for('watchlist'))
-
-# --- Perintah untuk Menjalankan Aplikasi ---
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
